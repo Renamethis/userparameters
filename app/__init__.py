@@ -9,4 +9,6 @@ def create_app(config_name):
     config[config_name].init_app(app)
     db.init_app(app)
     celery.init_app(app)
-    return 
+    return app
+
+app = create_app(os.getenv('FLASK_CONFIG') or 'default')

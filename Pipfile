@@ -4,9 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-celery = "*"
 flask = "*"
 flask-sqlalchemy = "*"
+flasgger = "*"
+celery = "*"
+redis = "*"
+pymysql = "*"
+cryptography = "*"
 
 [dev-packages]
 
