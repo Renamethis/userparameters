@@ -1,0 +1,58 @@
+version: "3"
+
+services:    
+  python:
+    depends_on:
+      - db
+    ports:
+      - 5000:5000
+    image: python:3.10.5
+    container_name: python
+    restart: unless-stopped
+    stdin_open: true
+    volumes:
+      - .:/app:z
+    build: .
+    working_dir: /app
+    command: flask run --host=0.0.0.0
+    environment:
+      - FLASK_APP=server.py
+      - DEV_DATABASE_URL=mysql+pymysql://user:secret@localhost:3306/prices
+  celery:
+    build: .
+    container_name: 'celery'
+    command: celery -A app.celery worker --loglevel=info
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+    environment:
+      - DEV_DATABASE_URL=mysql+pymysql://user:secret@localhost:3306/prices
+  db:
+    container_name: db
+    image: mysql
+    restart: unless-stopped
+    command: --init-file /init.sql
+    environment:
+        MYSQL_ROOT_USER: root
+        MYSQL_ROOT_PASSWORD: secret
+        MYSQL_DATABASE: userparameters
+        MYSQL_USER: user
+        MYSQL_PASSWORD: secret
+    ports:
+      - 3306:3306
+    volumes:
+      - my-db:/var/lib/mysql:rw
+      - ./init.sql:/init.sql
+  redis:
+    image: redis
+    restart: always
+    container_name: 'redis'
+    command: redis-server
+    ports:
+      - 6379:6379
+    links:
+      - db
+volumes:
+  my-db:
+    driver: local
