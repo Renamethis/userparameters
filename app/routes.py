@@ -3,6 +3,7 @@ from flask import jsonify, abort, request
 from .tasks import *
 from . import app
 
+# Swagger configuration
 swagger_config = {
     "headers": [
     ],
@@ -34,6 +35,7 @@ template = {
 
 swagger = Swagger(app, config=swagger_config, template=template)
 
+# Users endpoints
 @app.route("/users/<username>", methods=["POST"])
 def add_user(username):
     """Endpoint which adds user in database
@@ -79,8 +81,8 @@ def delete_user(username):
     task = delete_user_task.delay(username)
     result = task.wait(timeout=None)
     if result is None:
-        abort(409)
-    return jsonify(result), 200
+        abort(400)
+    return jsonify({'status': 'OK'}), 200
 
 @app.route("/users", methods=["GET"])
 def get_users():
@@ -96,6 +98,7 @@ def get_users():
     result = task.wait(timeout=None)
     return jsonify(result), 200
 
+# Parameters endpoints
 @app.route("/api/parameters/<username>/<name>/<type>", methods=["POST"])
 def set_parameter(username, name, type):
     """Endpoint which creates or updates user parameter
@@ -200,6 +203,7 @@ def get_parameters(username):
         abort(404)
     return jsonify(result), 200
 
+# JSON operation endpoint
 @app.route("/api/<username>", methods=["POST"])
 def json_set(username):
     """Endpoint set up parameter with JSON 
@@ -241,7 +245,8 @@ def json_set(username):
     response = body.copy()
     del response['Value']
     if(body['Operation'] == 'SetParam'):
-      task = set_parameter_task.delay(username, body['Name'], body['Type'], body['Value'])
+      task = set_parameter_task.delay(username, body['Name'], body['Type'], 
+                                      body['Value'])
       result = task.wait(timeout=None)
       if(result != 200):
         response['Status'] = 'ERROR'

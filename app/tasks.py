@@ -2,6 +2,7 @@ from .extensions import celery, db
 from .models import User, Parameter
 import os
 
+# Celery users managing tasks
 @celery.task
 def add_user_task(username):
     user = User.query.get(username)
@@ -23,8 +24,12 @@ def delete_user_task(username):
     if(user is None):
         return None
     db.session.delete(user)
+    for param in Parameter.query.filter_by(username=username):
+        db.session.delete(param)
     db.session.commit()
+    return user.to_json()
 
+# Celery parameters managing tasks
 @celery.task
 def get_parameters_task(username):
     user = User.query.get(username)

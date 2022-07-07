@@ -1,5 +1,7 @@
 from app import db
 
+# SQLAlchemy ORM models
+
 class User(db.Model):
     __tablename__ = 'users'
     query = db.session.query_property()
@@ -12,9 +14,11 @@ class User(db.Model):
 class Parameter(db.Model):
     __tablename__ = 'parameters'
     query = db.session.query_property()
-    username = db.Column(db.String(40), db.ForeignKey(User.username), primary_key=True)
+    username = db.Column(db.String(40), db.ForeignKey(User.username), 
+                         primary_key=True)
     parameterName = db.Column(db.String(40), nullable=False, primary_key=True)
-    ptype = db.Column(db.String(10), nullable=False, unique=False, primary_key=True)
+    ptype = db.Column(db.String(10), nullable=False, unique=False, 
+                      primary_key=True)
     value = db.Column(db.String(50), nullable=False, unique=False)
     def to_json(self):
         return {

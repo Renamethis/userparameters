@@ -2,7 +2,7 @@ from flask import Flask
 from config import config
 from .extensions import db, celery
 import os
-
+# Flask app factory
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
@@ -11,4 +11,5 @@ def create_app(config_name):
     celery.init_app(app)
     return app
 
+# Initialize flask app
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
